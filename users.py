@@ -102,4 +102,4 @@ def search_user(id: int):
     for user in users_list:
         if user.id == id:
             return user
-    return {"error":"No se ha encontrado el usuario"}
+    return {"error":"No se ha encontrado el usuarioESTO ES UNA PRUEBA"}
