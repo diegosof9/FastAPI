@@ -43,7 +43,6 @@ users_db = {
         "disabled": True,
         "password": "654321"        
     }
-    
 }
 
 def search_user_db(username: str):
