@@ -10,9 +10,6 @@ router = APIRouter(prefix="/userdb",
                    responses={status.HTTP_404_NOT_FOUND: {"message": "No encontrado"}})
 
 
-users_list = []
-
-
 @router.get("/", response_model=list[User])
 async def users():
     return users_schema(db_client.local.users.find())
@@ -64,42 +61,36 @@ async def user(user: User):
 
 
 # PUT
-@router.put("/")
+@router.put("/", response_model=User)
 async def user(user: User):
 
-    found = False
+    user_dict = dict(user)
+    del user_dict["id"]
 
-    for index, saved_user in enumerate(users_list):
-        if saved_user.id == user.id:
-            users_list[index] = user
-            found = True
-
-    if not found:
+    try:
+        db_client.local.users.find_one_and_replace({"_id": ObjectId(user.id)}, user_dict)    
+    except:
         return {"error":"No se ha actualizado el usuario"}
     
-    else:
-            return user
+    return search_user("_id", ObjectId(user.id))
+
 
 
 # DELETE
-@router.delete("/{id}")
-async def user(id: int):
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def user(id: str):
 
-    found = False
-
-    for index, saved_user in enumerate(users_list):
-        if saved_user.id == id:
-            del users_list[index]
-            found = True
+    found = db_client.local.users.find_one_and_delete({"_id": ObjectId(id)})
 
     if not found:
         return {"error": "No se ha eliminado el usuario"}
     
 
 def search_user(field: str, key): 
-    
+    print("Buscando:", {field: key})
     try:
         user = db_client.local.users.find_one({field: key})
+        print("Buscando:", {field: key})
         return User(**user_schema(user))
     except:
         return {"error": "No se ha encontrado el usuario"}
