@@ -11,7 +11,9 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_DURATION = 1
 SECRET = "e44ff49eaf0fa01f0a0684b7388c82f1ada3e579b370238646a97b8d0e9fc6e7"
 
-router = APIRouter()
+router = APIRouter(prefix="/jwtauth",
+                   tags=["jwtauth"],
+                   responses={status.HTTP_404_NOT_FOUND: {"message": "No encontrado"}})
 
 oauth2 = OAuth2PasswordBearer(tokenUrl="login")
 
